@@ -8,9 +8,11 @@ use EventSauce\EventSourcing\MessageDispatcherChain;
 use EventSauce\EventSourcing\Serialization\ConstructingMessageSerializer;
 use EventSauce\MessageRepository\TableSchema\DefaultTableSchema;
 use EventSauce\UuidEncoding\BinaryUuidEncoder;
+use EventSauce\UuidEncoding\StringUuidEncoder;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Workshop\Domains\Wallet\Infra\RandomNumberDecorator;
 use Workshop\Domains\Wallet\Infra\WalletMessageRepository;
 use Workshop\Domains\Wallet\Infra\WalletRepository;
 
@@ -25,7 +27,7 @@ class WalletServiceProvider extends ServiceProvider
                 tableName: 'wallet_messages',
                 serializer: new ConstructingMessageSerializer(),
                 tableSchema: new DefaultTableSchema(),
-                uuidEncoder: new BinaryUuidEncoder(),
+                uuidEncoder: new StringUuidEncoder(),
             );
         });
 
@@ -33,7 +35,7 @@ class WalletServiceProvider extends ServiceProvider
             return new WalletRepository(
                 $this->app->make(WalletMessageRepository::class),
                 new MessageDispatcherChain(),
-                new DefaultHeadersDecorator(),
+                new RandomNumberDecorator(new DefaultHeadersDecorator()),
                 new DotSeparatedSnakeCaseInflector(),
             );
         });
