@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use Workshop\Domains\Wallet\Infra\WalletBalanceRepository;
 use Workshop\Domains\Wallet\ReadModels\Transaction;
 use Livewire\Component;
 use Workshop\Domains\Wallet\Infra\WalletRepository;
@@ -13,33 +14,38 @@ class Transactions extends Component
 
     public $tokens = 0;
 
+    public int $balance = 0;
+
     protected $rules = [
         'tokens' => 'required|integer|min:1',
     ];
 
-    public function mount(string $walletId)
+    public function mount(string $walletId, WalletBalanceRepository $balanceRepository)
     {
         // check if wallet id can be parsed.
-        WalletId::fromString($walletId);
+        $id = WalletId::fromString($walletId);
         $this->walletId = $walletId;
+        $this->balance = $balanceRepository->getBalance($id);
     }
 
-    public function deposit(WalletRepository $walletRepository)
+    public function deposit(WalletRepository $walletRepository, WalletBalanceRepository $balanceRepository)
     {
 
         $wallet = $walletRepository->retrieve(WalletId::fromString($this->walletId));
         $wallet->deposit($this->tokens);
         $walletRepository->persist($wallet);
+        $this->balance = $balanceRepository->getBalance($wallet->aggregateRootId());
 
         $this->tokens = 0;
         session()->flash('success', 'Money successfully deposited.');
     }
 
-    public function withdraw(WalletRepository $walletRepository)
+    public function withdraw(WalletRepository $walletRepository, WalletBalanceRepository $balanceRepository)
     {
         $wallet = $walletRepository->retrieve(WalletId::fromString($this->walletId));
         $wallet->withdraw($this->tokens);
         $walletRepository->persist($wallet);
+        $this->balance = $balanceRepository->getBalance($wallet->aggregateRootId());
 
         $this->tokens = 0;
         session()->flash('success', 'Money successfully withdrawn.');

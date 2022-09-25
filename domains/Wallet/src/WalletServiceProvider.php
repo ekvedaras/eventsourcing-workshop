@@ -19,17 +19,21 @@ use Illuminate\Support\ServiceProvider;
 use Workshop\Domains\Wallet\Decorators\EventIDDecorator;
 use Workshop\Domains\Wallet\Infra\ClassMapInflector;
 use Workshop\Domains\Wallet\Infra\EloquentTransactionsReadModelRepository;
+use Workshop\Domains\Wallet\Infra\EloquentWalletBalanceRepository;
 use Workshop\Domains\Wallet\Infra\RandomNumberDecorator;
 use Workshop\Domains\Wallet\Infra\TransactionsReadModelRepository;
+use Workshop\Domains\Wallet\Infra\WalletBalanceRepository;
 use Workshop\Domains\Wallet\Infra\WalletMessageRepository;
 use Workshop\Domains\Wallet\Infra\WalletRepository;
 use Workshop\Domains\Wallet\Projectors\TransactionsProjector;
+use Workshop\Domains\Wallet\Projectors\WalletBalanceProjector;
 
 class WalletServiceProvider extends ServiceProvider
 {
     public function register()
     {
         $this->app->bind(TransactionsReadModelRepository::class, EloquentTransactionsReadModelRepository::class);
+        $this->app->bind(WalletBalanceRepository::class, EloquentWalletBalanceRepository::class);
 
         $this->app->bind(WalletMessageRepository::class, function (Application $application){
             return new WalletMessageRepository(
@@ -49,7 +53,8 @@ class WalletServiceProvider extends ServiceProvider
                 $this->app->make(WalletMessageRepository::class),
                 new MessageDispatcherChain(
                     new SynchronousMessageDispatcher(
-                        $this->app->make(TransactionsProjector::class)
+                        $this->app->make(TransactionsProjector::class),
+                        $this->app->make(WalletBalanceProjector::class),
                     )
                 ),
                 new MessageDecoratorChain(

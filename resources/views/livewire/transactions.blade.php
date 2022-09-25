@@ -7,8 +7,12 @@
                         <h1 class="text-xl font-semibold text-gray-900">Transactions</h1>
                         <p class="mt-2 text-sm text-gray-700">A list of all transactions for this wallet</p>
                     </div>
-                    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                        <div class="inline-flex">
+                    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex items-baseline space-x-4 flex-1">
+                        <div class="flex items-baseline flex-1">
+                            <div class="text-xl font-semibold {{ $this->balance > 0 ? 'text-green-600' : 'text-red-500' }} p-0">{{ $this->balance }}</div>
+                            <div class="ml-2 text-sm">{{ str('token')->plural($this->balance) }}</div>
+                        </div>
+                        <div class="inline-flex ml-2">
                             <div class="relative mt-1 rounded-md shadow-sm">
                                 <input wire:model="tokens" type="number" name="price" id="price" class="block w-full rounded-md border-gray-300 pl-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="0" aria-describedby="price-currency">
                                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">

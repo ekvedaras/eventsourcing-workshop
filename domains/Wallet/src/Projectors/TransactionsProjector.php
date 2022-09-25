@@ -9,7 +9,6 @@ use EventSauce\EventSourcing\Message;
 use Workshop\Domains\Wallet\Events\TokensDeposited;
 use Workshop\Domains\Wallet\Events\TokensWithdrawn;
 use Workshop\Domains\Wallet\Infra\TransactionsReadModelRepository;
-use Workshop\Domains\Wallet\WalletId;
 
 final class TransactionsProjector extends EventConsumer
 {
