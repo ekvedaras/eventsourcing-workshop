@@ -12,4 +12,6 @@ interface TransactionsReadModelRepository
         int $amount,
         Carbon $transactedAt
     ): void;
+
+    public function flush(): void;
 }
