@@ -27,6 +27,7 @@ use Workshop\Domains\Wallet\Infra\WalletMessageRepository;
 use Workshop\Domains\Wallet\Infra\WalletRepository;
 use Workshop\Domains\Wallet\Projectors\TransactionsProjector;
 use Workshop\Domains\Wallet\Projectors\WalletBalanceProjector;
+use Workshop\Domains\Wallet\Reactors\ReportHighBalanceReactor;
 
 class WalletServiceProvider extends ServiceProvider
 {
@@ -55,6 +56,7 @@ class WalletServiceProvider extends ServiceProvider
                     new SynchronousMessageDispatcher(
                         $this->app->make(TransactionsProjector::class),
                         $this->app->make(WalletBalanceProjector::class),
+                        $this->app->make(ReportHighBalanceReactor::class),
                     )
                 ),
                 new MessageDecoratorChain(
