@@ -2,6 +2,7 @@
 
 namespace Workshop\Domains\Wallet\Tests;
 
+use Carbon\CarbonImmutable;
 use EventSauce\EventSourcing\AggregateRoot;
 use EventSauce\EventSourcing\AggregateRootId;
 use EventSauce\EventSourcing\TestUtilities\AggregateRootTestCase;

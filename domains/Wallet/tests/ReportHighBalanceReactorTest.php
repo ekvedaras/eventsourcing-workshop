@@ -2,6 +2,7 @@
 
 namespace Workshop\Domains\Wallet\Tests;
 
+use Carbon\CarbonImmutable;
 use EventSauce\EventSourcing\Header;
 use EventSauce\EventSourcing\Message;
 use EventSauce\EventSourcing\MessageConsumer;
@@ -34,7 +35,7 @@ class ReportHighBalanceReactorTest extends MessageConsumerTestCase
             ->givenNextMessagesHaveAggregateRootIdOf($this->walletId)
             ->when(
                 (new Message(
-                    new TokensDeposited(1, 'test')
+                    new TokensDeposited(1, 'test', CarbonImmutable::parse('2022-09-08 13:16:35.790434+0000'))
                 ))->withHeaders([
                     Header::EVENT_ID => 'event-id',
                     Header::TIME_OF_RECORDING => '2022-09-08 13:16:35.790434+0000',

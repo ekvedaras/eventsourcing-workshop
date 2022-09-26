@@ -17,7 +17,7 @@ class Wallet implements AggregateRoot
 
     public function deposit(int $tokens, string $description): void
     {
-        $this->recordThat(new TokensDeposited($tokens, $description));
+        $this->recordThat(new TokensDeposited($tokens, $description, now()->toImmutable()));
     }
 
     public function withdraw(int $tokens, string $description): void
@@ -31,7 +31,7 @@ class Wallet implements AggregateRoot
             throw BalanceException::insufficientTokens(attemptedToWithdraw: $tokens, balance: $this->balance);
         }
 
-        $this->recordThat(new TokensWithdrawn($tokens, $description));
+        $this->recordThat(new TokensWithdrawn($tokens, $description, now()->toImmutable()));
     }
 
     private function applyTokensDeposited(TokensDeposited $event): void

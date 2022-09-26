@@ -2,6 +2,7 @@
 
 namespace Workshop\Domains\Wallet\Tests;
 
+use Carbon\CarbonImmutable;
 use EventSauce\EventSourcing\Header;
 use EventSauce\EventSourcing\Message;
 use EventSauce\EventSourcing\MessageConsumer;
@@ -31,7 +32,7 @@ class WalletBalanceProjectorTest extends MessageConsumerTestCase
             ->givenNextMessagesHaveAggregateRootIdOf($this->walletId)
             ->when(
                 (new Message(
-                    new TokensDeposited(10, 'demo')
+                    new TokensDeposited(10, 'demo', CarbonImmutable::parse('2022-09-08 13:16:35.790434+0000'))
                 ))->withHeaders([
                     Header::EVENT_ID => 'event-id',
                     Header::TIME_OF_RECORDING => '2022-09-08 13:16:35.790434+0000',
@@ -50,7 +51,7 @@ class WalletBalanceProjectorTest extends MessageConsumerTestCase
             ->givenNextMessagesHaveAggregateRootIdOf($this->walletId)
             ->given(
                 (new Message(
-                    new TokensDeposited(10, 'demo')
+                    new TokensDeposited(10, 'demo', CarbonImmutable::parse('2022-09-08 13:16:35.790434+0000'))
                 ))->withHeaders([
                                     Header::EVENT_ID => 'event-id-1',
                                     Header::TIME_OF_RECORDING => '2022-09-08 13:16:35.790434+0000',
