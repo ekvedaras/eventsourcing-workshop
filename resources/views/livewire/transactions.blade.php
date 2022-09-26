@@ -14,7 +14,10 @@
                         </div>
                         <div class="inline-flex ml-2">
                             <div class="relative mt-1 rounded-md shadow-sm">
-                                <input wire:model="tokens" type="number" name="price" id="price" class="block w-full rounded-md border-gray-300 pl-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="0" aria-describedby="price-currency">
+                                <div class="inline-flex">
+                                    <input wire:model="description" type="text" name="description" class="block w-full rounded-md border-gray-300 pl-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="description">
+                                    <input wire:model="tokens" type="number" name="price" id="price" class="block w-full rounded-md border-gray-300 pl-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="0" aria-describedby="price-currency">
+                                </div>
                                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                                     <span class="text-gray-500 sm:text-sm" id="price-currency">Tokens</span>
                                 </div>
@@ -31,6 +34,7 @@
                                 <table class="min-w-full divide-y divide-gray-300">
                                     <thead class="bg-gray-50">
                                     <tr>
+                                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Description</th>
                                         <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Amount</th>
                                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">date</th>
                                     </tr>
@@ -38,6 +42,9 @@
                                     <tbody class="divide-y divide-gray-200 bg-white">
                                     @foreach($transactions as $transaction)
                                         <tr>
+                                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                                {{$transaction->description}}
+                                            </td>
                                             <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium @if($transaction->amount < 0 ) text-red-600 @else text-gray-900 @endif sm:pl-6">
                                                 {{$transaction->amount}}
                                             </td>

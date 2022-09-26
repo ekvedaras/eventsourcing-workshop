@@ -13,6 +13,7 @@ class Transactions extends Component
     public string $walletId;
 
     public $tokens = 0;
+    public $description = '';
 
     public int $balance = 0;
 
@@ -32,22 +33,24 @@ class Transactions extends Component
     {
 
         $wallet = $walletRepository->retrieve(WalletId::fromString($this->walletId));
-        $wallet->deposit($this->tokens);
+        $wallet->deposit($this->tokens, $this->description);
         $walletRepository->persist($wallet);
         $this->balance = $balanceRepository->getBalance($wallet->aggregateRootId());
 
         $this->tokens = 0;
+        $this->description = '';
         session()->flash('success', 'Money successfully deposited.');
     }
 
     public function withdraw(WalletRepository $walletRepository, WalletBalanceRepository $balanceRepository)
     {
         $wallet = $walletRepository->retrieve(WalletId::fromString($this->walletId));
-        $wallet->withdraw($this->tokens);
+        $wallet->withdraw($this->tokens, $this->description);
         $walletRepository->persist($wallet);
         $this->balance = $balanceRepository->getBalance($wallet->aggregateRootId());
 
         $this->tokens = 0;
+        $this->description = '';
         session()->flash('success', 'Money successfully withdrawn.');
     }
 

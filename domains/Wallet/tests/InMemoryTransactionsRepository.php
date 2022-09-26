@@ -9,13 +9,14 @@ class InMemoryTransactionsRepository implements TransactionsReadModelRepository
 {
     private array $transactions = [];
 
-    public function addTransaction(string $eventId, string $walletId, int $amount, Carbon $transactedAt): void
+    public function addTransaction(string $eventId, string $walletId, int $amount, Carbon $transactedAt, string $description): void
     {
         $this->transactions[] = [
             'eventId' => $eventId,
             'walletId' => $walletId,
             'amount' => $amount,
             'transactedAt' => $transactedAt,
+            'description' => $description,
         ];
     }
 
