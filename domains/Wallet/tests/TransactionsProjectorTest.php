@@ -30,7 +30,7 @@ class TransactionsProjectorTest extends MessageConsumerTestCase
             ->givenNextMessagesHaveAggregateRootIdOf($this->walletId)
             ->when(
                 (new Message(
-                    new TokensDeposited(10)
+                    new TokensDeposited(10, 'demo')
                 ))->withHeaders([
                     Header::EVENT_ID => 'event-id',
                     Header::TIME_OF_RECORDING => '2022-09-08 13:16:35.790434+0000',
@@ -54,7 +54,7 @@ class TransactionsProjectorTest extends MessageConsumerTestCase
             ->givenNextMessagesHaveAggregateRootIdOf($this->walletId)
             ->given(
                 (new Message(
-                    new TokensDeposited(10)
+                    new TokensDeposited(10, 'demo')
                 ))->withHeaders([
                                     Header::EVENT_ID => 'event-id-1',
                                     Header::TIME_OF_RECORDING => '2022-09-08 13:16:35.790434+0000',
@@ -63,7 +63,7 @@ class TransactionsProjectorTest extends MessageConsumerTestCase
             )
             ->when(
                 (new Message(
-                    new TokensWithdrawn(7)
+                    new TokensWithdrawn(7, 'demo')
                 ))->withHeaders([
                                     Header::EVENT_ID => 'event-id-2',
                                     Header::TIME_OF_RECORDING => '2022-09-08 13:16:35.790434+0000',

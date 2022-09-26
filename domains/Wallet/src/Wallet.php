@@ -15,12 +15,12 @@ class Wallet implements AggregateRoot
 
     private int $balance = 0;
 
-    public function deposit(int $tokens): void
+    public function deposit(int $tokens, string $description): void
     {
-        $this->recordThat(new TokensDeposited($tokens));
+        $this->recordThat(new TokensDeposited($tokens, $description));
     }
 
-    public function withdraw(int $tokens): void
+    public function withdraw(int $tokens, string $description): void
     {
         if ($tokens > $this->balance) {
             $this->recordThat(new FailedToWithdrawDueToInsufficientTokens(
@@ -31,7 +31,7 @@ class Wallet implements AggregateRoot
             throw BalanceException::insufficientTokens(attemptedToWithdraw: $tokens, balance: $this->balance);
         }
 
-        $this->recordThat(new TokensWithdrawn($tokens));
+        $this->recordThat(new TokensWithdrawn($tokens, $description));
     }
 
     private function applyTokensDeposited(TokensDeposited $event): void

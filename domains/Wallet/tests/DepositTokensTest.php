@@ -10,7 +10,7 @@ class DepositTokensTest extends WalletTestCase
     public function test_it_can_deposit_tokens(): void
     {
         $this->given()
-            ->when(fn (Wallet $wallet) => $wallet->deposit(100))
-            ->then(new TokensDeposited(100));
+            ->when(fn (Wallet $wallet) => $wallet->deposit(100, 'demo'))
+            ->then(new TokensDeposited(100, 'demo'));
     }
 }

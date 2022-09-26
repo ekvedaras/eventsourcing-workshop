@@ -20,6 +20,7 @@ use Workshop\Domains\Wallet\Decorators\EventIDDecorator;
 use Workshop\Domains\Wallet\Infra\ClassMapInflector;
 use Workshop\Domains\Wallet\Infra\EloquentTransactionsReadModelRepository;
 use Workshop\Domains\Wallet\Infra\EloquentWalletBalanceRepository;
+use Workshop\Domains\Wallet\Infra\NotificationService;
 use Workshop\Domains\Wallet\Infra\RandomNumberDecorator;
 use Workshop\Domains\Wallet\Infra\TransactionsReadModelRepository;
 use Workshop\Domains\Wallet\Infra\WalletBalanceRepository;
@@ -28,11 +29,13 @@ use Workshop\Domains\Wallet\Infra\WalletRepository;
 use Workshop\Domains\Wallet\Projectors\TransactionsProjector;
 use Workshop\Domains\Wallet\Projectors\WalletBalanceProjector;
 use Workshop\Domains\Wallet\Reactors\ReportHighBalanceReactor;
+use Workshop\Domains\Wallet\Tests\InMemoryNotificationService;
 
 class WalletServiceProvider extends ServiceProvider
 {
     public function register()
     {
+        $this->app->bind(NotificationService::class, InMemoryNotificationService::class);
         $this->app->bind(TransactionsReadModelRepository::class, EloquentTransactionsReadModelRepository::class);
         $this->app->bind(WalletBalanceRepository::class, EloquentWalletBalanceRepository::class);
 
@@ -40,10 +43,7 @@ class WalletServiceProvider extends ServiceProvider
             return new WalletMessageRepository(
                 connection: $application->make(DatabaseManager::class)->connection(),
                 tableName: 'wallet_messages',
-                serializer: new ConstructingMessageSerializer(
-                    classNameInflector: new ExplicitlyMappedClassNameInflector(config('wallet.class-map')),
-                    payloadSerializer: new ObjectMapperPayloadSerializer()
-                ),
+                serializer: new ConstructingMessageSerializer(classNameInflector: new ExplicitlyMappedClassNameInflector(config('wallet.class-map'))),
                 tableSchema: new DefaultTableSchema(),
                 uuidEncoder: new StringUuidEncoder(),
             );

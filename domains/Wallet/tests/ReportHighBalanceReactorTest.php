@@ -34,7 +34,7 @@ class ReportHighBalanceReactorTest extends MessageConsumerTestCase
             ->givenNextMessagesHaveAggregateRootIdOf($this->walletId)
             ->when(
                 (new Message(
-                    new TokensDeposited(1)
+                    new TokensDeposited(1, 'test')
                 ))->withHeaders([
                     Header::EVENT_ID => 'event-id',
                     Header::TIME_OF_RECORDING => '2022-09-08 13:16:35.790434+0000',
@@ -46,7 +46,7 @@ class ReportHighBalanceReactorTest extends MessageConsumerTestCase
             })
             ->when(
                 (new Message(
-                    new TokensDeposited(10)
+                    new TokensDeposited(10, 'test')
                 ))->withHeaders([
                                     Header::EVENT_ID => 'event-id-2',
                                     Header::TIME_OF_RECORDING => '2022-09-08 13:16:35.790434+0000',

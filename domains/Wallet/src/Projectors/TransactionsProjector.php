@@ -29,6 +29,7 @@ final class TransactionsProjector extends EventConsumer implements TriggerBefore
             walletId:     $message->aggregateRootId()->toString(),
             amount:       $event->tokens,
             transactedAt: Carbon::createFromImmutable($message->timeOfRecording()),
+            description: $event->description,
         );
     }
 
@@ -39,6 +40,7 @@ final class TransactionsProjector extends EventConsumer implements TriggerBefore
             walletId:     $message->aggregateRootId()->toString(),
             amount:       -$event->tokens,
             transactedAt: Carbon::createFromImmutable($message->timeOfRecording()),
+            description: $event->description,
         );
     }
 }
