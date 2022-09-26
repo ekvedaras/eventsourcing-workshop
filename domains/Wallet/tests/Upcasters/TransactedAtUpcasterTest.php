@@ -18,9 +18,9 @@ class TransactedAtUpcasterTest extends TestCase
     {
         $input = [
             'headers' => [
-                '__event_type' => 'random'
+                '__event_type' => 'random',
             ],
-            'payload' => []
+            'payload' => [],
         ];
         $output = $this->upcast($input);
 
@@ -32,11 +32,11 @@ class TransactedAtUpcasterTest extends TestCase
     {
         $input = [
             'headers' => [
-                '__event_type' => 'tokens_deposited',
+                '__event_type' => 'tokens-withdrawn',
             ],
             'payload' => [
-                'transacted_at' => '2022-09-15 17:09:42.410100+0000'
-            ]
+                'transacted_at' => '2022-09-15 17:09:42.410100+0000',
+            ],
         ];
         $output = $this->upcast($input);
 
@@ -48,11 +48,11 @@ class TransactedAtUpcasterTest extends TestCase
     {
         $input = [
             'headers' => [
-                '__event_type' => 'tokens_deposited',
+                '__event_type'        => 'tokens-deposited',
                 '__time_of_recording' => '2022-09-15 17:09:42.410100+0000',
             ],
             'payload' => [
-            ]
+            ],
         ];
         $output = $this->upcast($input);
 

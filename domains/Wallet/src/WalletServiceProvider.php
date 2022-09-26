@@ -3,15 +3,14 @@
 namespace Workshop\Domains\Wallet;
 
 use EventSauce\EventSourcing\DefaultHeadersDecorator;
-use EventSauce\EventSourcing\DotSeparatedSnakeCaseInflector;
 use EventSauce\EventSourcing\ExplicitlyMappedClassNameInflector;
 use EventSauce\EventSourcing\MessageDecoratorChain;
 use EventSauce\EventSourcing\MessageDispatcherChain;
 use EventSauce\EventSourcing\Serialization\ConstructingMessageSerializer;
-use EventSauce\EventSourcing\Serialization\ObjectMapperPayloadSerializer;
 use EventSauce\EventSourcing\SynchronousMessageDispatcher;
+use EventSauce\EventSourcing\Upcasting\UpcasterChain;
+use EventSauce\EventSourcing\Upcasting\UpcastingMessageSerializer;
 use EventSauce\MessageRepository\TableSchema\DefaultTableSchema;
-use EventSauce\UuidEncoding\BinaryUuidEncoder;
 use EventSauce\UuidEncoding\StringUuidEncoder;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Foundation\Application;
@@ -30,6 +29,7 @@ use Workshop\Domains\Wallet\Projectors\TransactionsProjector;
 use Workshop\Domains\Wallet\Projectors\WalletBalanceProjector;
 use Workshop\Domains\Wallet\Reactors\ReportHighBalanceReactor;
 use Workshop\Domains\Wallet\Tests\InMemoryNotificationService;
+use Workshop\Domains\Wallet\Upcasters\TransactedAtUpcaster;
 
 class WalletServiceProvider extends ServiceProvider
 {
@@ -39,11 +39,18 @@ class WalletServiceProvider extends ServiceProvider
         $this->app->bind(TransactionsReadModelRepository::class, EloquentTransactionsReadModelRepository::class);
         $this->app->bind(WalletBalanceRepository::class, EloquentWalletBalanceRepository::class);
 
-        $this->app->bind(WalletMessageRepository::class, function (Application $application){
+        $this->app->bind(WalletMessageRepository::class, function (Application $application) {
             return new WalletMessageRepository(
-                connection: $application->make(DatabaseManager::class)->connection(),
-                tableName: 'wallet_messages',
-                serializer: new ConstructingMessageSerializer(classNameInflector: new ExplicitlyMappedClassNameInflector(config('wallet.class-map'))),
+                connection:  $application->make(DatabaseManager::class)->connection(),
+                tableName:   'wallet_messages',
+                serializer:  new UpcastingMessageSerializer(
+                                 eventSerializer: new ConstructingMessageSerializer(
+                                                      classNameInflector: $this->getClassNameInflector()
+                                                  ),
+                                 upcaster:        new UpcasterChain(
+                                                      upcasters: new TransactedAtUpcaster()
+                                                  )
+                             ),
                 tableSchema: new DefaultTableSchema(),
                 uuidEncoder: new StringUuidEncoder(),
             );
@@ -62,11 +69,11 @@ class WalletServiceProvider extends ServiceProvider
                 new MessageDecoratorChain(
                     new EventIDDecorator(),
                     new DefaultHeadersDecorator(
-                        inflector: $inflector = new ExplicitlyMappedClassNameInflector(config('wallet.class-map'))
+                        inflector: $this->getClassNameInflector()
                     ),
                     new RandomNumberDecorator(),
                 ),
-                $inflector,
+                $this->getClassNameInflector(),
             );
         });
     }
@@ -74,5 +81,13 @@ class WalletServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->mergeConfigFrom(base_path('domains/Wallet/infra/config/wallet.php'), 'wallet');
+    }
+
+    /**
+     * @return ExplicitlyMappedClassNameInflector
+     */
+    private function getClassNameInflector(): ExplicitlyMappedClassNameInflector
+    {
+        return new ExplicitlyMappedClassNameInflector(config('wallet.class-map'));
     }
 }
