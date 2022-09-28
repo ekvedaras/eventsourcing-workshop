@@ -12,17 +12,17 @@ class WithdrawTokensTest extends WalletTestCase
 {
     public function test_it_can_withdraw_tokens(): void
     {
-        $this->given(new TokensDeposited(100, 'demo', now()->toImmutable()))
-            ->when(fn(Wallet $wallet) => $wallet->withdraw(100, 'demo', now()->toImmutable()))
-            ->then(new TokensWithdrawn(100, 'demo', now()->toImmutable()));
+        $this->given(new TokensDeposited(100, 'demo', $this->currentTime()))
+            ->when(fn(Wallet $wallet) => $wallet->withdraw(100, 'demo', $this->clock()))
+            ->then(new TokensWithdrawn(100, 'demo', $this->currentTime()));
     }
 
     public function test_it_cannot_overdraw_tokens(): void
     {
-        $this->given(new TokensDeposited(100, 'demo', now()->micro(0)->toImmutable()))
+        $this->given(new TokensDeposited(100, 'demo', $this->currentTime()))
             ->when(function (Wallet $wallet) {
                 try {
-                    $wallet->withdraw(101, 'demo', now()->toImmutable());
+                    $wallet->withdraw(101, 'demo', $this->clock());
                     $this->fail('Balance exception was expected');
                 } catch (BalanceException $exception) {
                     $this->assertEquals(BalanceException::insufficientTokens(

@@ -3,6 +3,8 @@
 namespace Workshop\Domains\Wallet\Tests;
 
 use Carbon\CarbonImmutable;
+use EventSauce\Clock\Clock;
+use EventSauce\Clock\TestClock;
 use EventSauce\EventSourcing\Header;
 use EventSauce\EventSourcing\Message;
 use EventSauce\EventSourcing\MessageConsumer;
@@ -17,12 +19,14 @@ class WalletBalanceProjectorTest extends MessageConsumerTestCase
 {
     private readonly WalletId $walletId;
     private readonly InMemoryWalletBalanceRepository $balanceRepository;
+    private readonly Clock $clock;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->walletId = WalletId::generate();
+        $this->clock = new TestClock();
     }
 
     /** @test */
@@ -32,7 +36,7 @@ class WalletBalanceProjectorTest extends MessageConsumerTestCase
             ->givenNextMessagesHaveAggregateRootIdOf($this->walletId)
             ->when(
                 (new Message(
-                    new TokensDeposited(10, 'demo', CarbonImmutable::parse('2022-09-08 13:16:35.790434+0000'))
+                    new TokensDeposited(10, 'demo', $this->clock->now())
                 ))->withHeaders([
                     Header::EVENT_ID => 'event-id',
                     Header::TIME_OF_RECORDING => '2022-09-08 13:16:35.790434+0000',
@@ -51,7 +55,7 @@ class WalletBalanceProjectorTest extends MessageConsumerTestCase
             ->givenNextMessagesHaveAggregateRootIdOf($this->walletId)
             ->given(
                 (new Message(
-                    new TokensDeposited(10, 'demo', CarbonImmutable::parse('2022-09-08 13:16:35.790434+0000'))
+                    new TokensDeposited(10, 'demo', $this->clock->now())
                 ))->withHeaders([
                                     Header::EVENT_ID => 'event-id-1',
                                     Header::TIME_OF_RECORDING => '2022-09-08 13:16:35.790434+0000',
@@ -60,7 +64,7 @@ class WalletBalanceProjectorTest extends MessageConsumerTestCase
             )
             ->when(
                 (new Message(
-                    new TokensWithdrawn(7, 'demo')
+                    new TokensWithdrawn(7, 'demo', $this->clock->now())
                 ))->withHeaders([
                                     Header::EVENT_ID => 'event-id-2',
                                     Header::TIME_OF_RECORDING => '2022-09-08 13:16:35.790434+0000',
