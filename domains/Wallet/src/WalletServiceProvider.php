@@ -2,9 +2,11 @@
 
 namespace Workshop\Domains\Wallet;
 
+use EventSauce\Clock\Clock;
 use EventSauce\EventSourcing\DefaultHeadersDecorator;
 use EventSauce\EventSourcing\ExplicitlyMappedClassNameInflector;
 use EventSauce\EventSourcing\MessageDecoratorChain;
+use EventSauce\EventSourcing\MessageDispatcher;
 use EventSauce\EventSourcing\MessageDispatcherChain;
 use EventSauce\EventSourcing\Serialization\ConstructingMessageSerializer;
 use EventSauce\EventSourcing\SynchronousMessageDispatcher;
@@ -15,6 +17,9 @@ use EventSauce\UuidEncoding\StringUuidEncoder;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Robertbaelde\PersistingMessageBus\DefaultMessageDecorator;
+use Robertbaelde\PersistingMessageBus\Laravel\IlluminateMessageRepository;
+use Robertbaelde\PersistingMessageBus\MessageBus;
 use Workshop\Domains\Wallet\Decorators\EventIDDecorator;
 use Workshop\Domains\Wallet\Infra\ClassMapInflector;
 use Workshop\Domains\Wallet\Infra\EloquentTransactionsReadModelRepository;
@@ -27,9 +32,12 @@ use Workshop\Domains\Wallet\Infra\WalletMessageRepository;
 use Workshop\Domains\Wallet\Infra\WalletRepository;
 use Workshop\Domains\Wallet\Projectors\TransactionsProjector;
 use Workshop\Domains\Wallet\Projectors\WalletBalanceProjector;
+use Workshop\Domains\Wallet\PublicEvents\Balance\Balance;
+use Workshop\Domains\Wallet\Reactors\PublishBalanceEventsReactor;
 use Workshop\Domains\Wallet\Reactors\ReportHighBalanceReactor;
 use Workshop\Domains\Wallet\Tests\InMemoryNotificationService;
-use Workshop\Domains\Wallet\Upcasters\TransactedAtUpcasterTest;
+use Workshop\Domains\Wallet\Upcasters\TokenAmountCorrectionsUpcaster;
+use Workshop\Domains\Wallet\Upcasters\TransactedAtUpcaster;
 
 class WalletServiceProvider extends ServiceProvider
 {
@@ -48,7 +56,8 @@ class WalletServiceProvider extends ServiceProvider
                                                       classNameInflector: $this->getClassNameInflector()
                                                   ),
                                  upcaster:        new UpcasterChain(
-                                                      upcasters: new TransactedAtUpcasterTest()
+                                                      new TransactedAtUpcaster(),
+                                                      new TokenAmountCorrectionsUpcaster(app(Clock::class)),
                                                   )
                              ),
                 tableSchema: new DefaultTableSchema(),
@@ -63,6 +72,7 @@ class WalletServiceProvider extends ServiceProvider
                     new SynchronousMessageDispatcher(
                         $this->app->make(TransactionsProjector::class),
                         $this->app->make(WalletBalanceProjector::class),
+                        $this->app->make(PublishBalanceEventsReactor::class),
                         $this->app->make(ReportHighBalanceReactor::class),
                     )
                 ),
@@ -74,6 +84,24 @@ class WalletServiceProvider extends ServiceProvider
                     new RandomNumberDecorator(),
                 ),
                 $this->getClassNameInflector(),
+            );
+        });
+
+        $this->app->bind('WalletPublicEvents', function (Application $application) {
+            return new IlluminateMessageRepository(
+                connection: $application->make(DatabaseManager::class)->connection(),
+                tableName: 'wallet_public_events',
+                tableSchema: new \Robertbaelde\PersistingMessageBus\DefaultTableSchema(),
+            );
+        });
+
+        $this->app->bind(MessageDispatcher::class, function (Application $application) {
+            return new \Robertbaelde\PersistingMessageBus\MessageDispatcher(
+                messageBus: new MessageBus(
+                    topic: new Balance(),
+                    messageRepository: $application->make('WalletPublicEvents'),
+                ),
+                messageDecorator: new DefaultMessageDecorator($application->make(Clock::class)),
             );
         });
     }

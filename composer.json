@@ -15,7 +15,8 @@
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "league/tactician": "^1.1",
-        "livewire/livewire": "^2.5"
+        "livewire/livewire": "^2.5",
+        "robertbaelde/persisting-message-bus": "dev-main"
     },
     "require-dev": {
         "eventsauce/test-utilities": "^3.0",
