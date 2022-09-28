@@ -4,10 +4,15 @@ namespace Workshop\Domains\Wallet\Upcasters;
 
 use EventSauce\EventSourcing\Header;
 use EventSauce\EventSourcing\Upcasting\Upcaster;
+use Illuminate\Contracts\Config\Repository as Config;
 
-class TransactedAtUpcaster implements Upcaster
+class TokenAmountCorrectionsUpcaster implements Upcaster
 {
     private const eventsToUpcast = ['tokens-withdrawn', 'tokens-deposited'];
+
+    public function __construct(private readonly Config $config)
+    {
+    }
 
     public function upcast(array $message): array
     {
@@ -15,7 +20,8 @@ class TransactedAtUpcaster implements Upcaster
             return $message;
         }
 
-        $message['payload']['transacted_at'] ??= $message['headers'][Header::TIME_OF_RECORDING] ?? null;
+        $message['payload']['tokens'] = $this->config->get('wallet.corrections.' . $message['headers'][Header::AGGREGATE_ROOT_ID])
+                                        ?? $message['payload']['tokens'];
 
         return $message;
     }

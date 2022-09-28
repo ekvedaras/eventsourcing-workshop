@@ -15,4 +15,7 @@ return [
         TokensWithdrawn::class => 'tokens-withdrawn',
         FailedToWithdrawDueToInsufficientTokens::class => 'failed-to-withdraw-due-to-insufficient-tokens',
     ],
+    'corrections' => [
+        'b8d0b0e0-5c1a-4b1e-8c7c-1c6b1b1b1b1b' => 10,
+    ],
 ];

@@ -29,7 +29,7 @@ use Workshop\Domains\Wallet\Projectors\TransactionsProjector;
 use Workshop\Domains\Wallet\Projectors\WalletBalanceProjector;
 use Workshop\Domains\Wallet\Reactors\ReportHighBalanceReactor;
 use Workshop\Domains\Wallet\Tests\InMemoryNotificationService;
-use Workshop\Domains\Wallet\Upcasters\TransactedAtUpcaster;
+use Workshop\Domains\Wallet\Upcasters\TransactedAtUpcasterTest;
 
 class WalletServiceProvider extends ServiceProvider
 {
@@ -48,7 +48,7 @@ class WalletServiceProvider extends ServiceProvider
                                                       classNameInflector: $this->getClassNameInflector()
                                                   ),
                                  upcaster:        new UpcasterChain(
-                                                      upcasters: new TransactedAtUpcaster()
+                                                      upcasters: new TransactedAtUpcasterTest()
                                                   )
                              ),
                 tableSchema: new DefaultTableSchema(),
