@@ -41,6 +41,7 @@ class TokenAmountCorrectionsUpcasterTest extends TestCase
     {
         $input = [
             'headers' => [
+                '__aggregate_root_id' => '123',
                 '__event_type' => 'tokens-withdrawn',
             ],
             'payload' => [
@@ -57,6 +58,7 @@ class TokenAmountCorrectionsUpcasterTest extends TestCase
     {
         $input = [
             'headers' => [
+                '__aggregate_root_id' => 'b8d0b0e0-5c1a-4b1e-8c7c-1c6b1b1b1b1b',
                 '__event_type'        => 'tokens-deposited',
             ],
             'payload' => [
